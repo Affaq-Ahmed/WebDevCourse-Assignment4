@@ -1,11 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./sidebar.css";
 import avatar from "../../images/avatar.jpg";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { Context } from "../../Context/Context";
 
 export default function SideBar() {
 	const [cats, setCats] = useState([]);
+	const { user } = useContext(Context);
+	const PF = "http://localhost:5001/images/";
 
 	useEffect(() => {
 		const getCategories = async () => {
@@ -19,7 +22,15 @@ export default function SideBar() {
 		<div className="sidebar">
 			<div className="sidebarItem">
 				<span className="sidebarTitle">ABOUT ME</span>
-				<img src={avatar} alt="of-me" />
+				{user ? (
+					user.profilePic ? (
+						<img src={PF + user.profilePic} alt="avatar" />
+					) : (
+						<img src={avatar} alt="avatar" />
+					)
+				) : (
+					<img src={avatar} alt="avatar" />
+				)}
 				<p className="sidebarDesc">
 					Lorem ipsum dolor sit amet consectetur, adipisicing elit. Animi
 					doloremque obcaecati magni soluta nihil,

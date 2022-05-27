@@ -9,7 +9,7 @@ router.post("/", async (req, res) => {
 		console.log(newPost);
 		const savedPost = await newPost.save();
 		console.log(savedPost);
-		res.status(200).json(savedPost);
+		res.status(201).json(savedPost);
 	} catch (error) {
 		res.status(500).json(error);
 	}
@@ -70,33 +70,33 @@ router.get("/:id", async (req, res) => {
 //GET ALL POSTS
 router.get("/", async (req, res) => {
 	console.log(req.query);
-	const PAGE_SIZE = 2;
+	const PAGE_SIZE = 10;
 	const username = req.query.user;
 	const categories = req.query.category;
 	const page = parseInt(req.query.page);
+	console.log(username);
 	try {
-		const total = await Post.countDocuments({});
-		console.log(total);
-		try {
-			let posts;
-			if (username)
-				posts = await Post.find({ username })
-					.limit(PAGE_SIZE)
-					.skip(PAGE_SIZE * page);
-			else if (categories)
-				posts = await Post.find({ categories: { $in: [categories] } })
-					.limit(PAGE_SIZE)
-					.skip(PAGE_SIZE * page);
-			else
-				posts = await Post.find({})
-					.limit(PAGE_SIZE)
-					.skip(PAGE_SIZE * page);
-
-			console.log({ posts, totalPages: Math.ceil(total / PAGE_SIZE) });
-			res.status(200).json({ posts, totalPages: Math.ceil(total / PAGE_SIZE) });
-		} catch (error) {
-			res.status(500).json(error);
+		let posts;
+		let total;
+		if (username) {
+			total = await Post.countDocuments({ username });
+			posts = await Post.find({ username })
+				.limit(PAGE_SIZE)
+				.skip(PAGE_SIZE * page);
+		} else if (categories) {
+			total = await Post.countDocuments({ categories });
+			posts = await Post.find({ categories: { $in: [categories] } })
+				.limit(PAGE_SIZE)
+				.skip(PAGE_SIZE * page);
+		} else {
+			total = await Post.countDocuments({});
+			posts = await Post.find({})
+				.limit(PAGE_SIZE)
+				.skip(PAGE_SIZE * page);
 		}
+
+		console.log({ totalPages: Math.ceil(total / PAGE_SIZE) });
+		res.status(200).json({ posts, totalPages: Math.ceil(total / PAGE_SIZE) });
 	} catch (error) {
 		res.status(500).json(error);
 	}

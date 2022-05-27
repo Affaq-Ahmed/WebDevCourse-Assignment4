@@ -8,22 +8,43 @@ import { useLocation } from "react-router-dom";
 
 export default function Home() {
 	const [posts, setPosts] = useState([]);
+	const [pageNumber, setPageNumber] = useState(0);
+	const [totalPages, setTotalPages] = useState(0);
 	const { search } = useLocation();
 	console.log(search);
 
+	const pages = new Array(totalPages).fill(null).map((v, i) => i);
+
 	useEffect(() => {
 		const fetchPosts = async () => {
-			const res = await axios.get("/post" + search);
-			setPosts(res.data);
+			const user = search.slice(1);
+			const res = await axios.get(`/post?page=${pageNumber}&${user}`);
+
+			setPosts(res.data.posts);
+			setTotalPages(res.data.totalPages);
 		};
 		fetchPosts();
-	}, [search]);
+	}, [pageNumber, search]);
+
+	const previousPage = () => {
+		setPageNumber(Math.max(0, pageNumber - 1));
+	};
+
+	const nextPage = () => {
+		setPageNumber(Math.min(totalPages - 1, pageNumber + 1));
+	};
 
 	return (
 		<>
 			<Header />
 			<div className="home">
-				<Posts posts={posts} />
+				<Posts
+					posts={posts}
+					pages={pages}
+					setPageNumber={setPageNumber}
+					previousPage={previousPage}
+					nextPage={nextPage}
+				/>
 				<SideBar />
 			</div>
 		</>

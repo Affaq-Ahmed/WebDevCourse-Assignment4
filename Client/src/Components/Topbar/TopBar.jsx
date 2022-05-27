@@ -56,7 +56,11 @@ export default function TopBar() {
 						to="/settings"
 						style={{ textDecoration: "none", color: "inherit" }}
 					>
-						<img className="topImg" src={PF + user.profilePic} alt="avatar" />
+						{user.profilePic ? (
+							<img className="topImg" src={PF + user.profilePic} alt="avatar" />
+						) : (
+							<img className="topImg" src={avatar} alt="avatar" />
+						)}
 					</Link>
 				) : (
 					<ul className="topList">
